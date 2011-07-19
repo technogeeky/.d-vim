@@ -1,32 +1,72 @@
-" Do something to the runtime path that I don't quite understand.
+" --- ------ | -- --- ------ | -- --- ------ |
+" vim: set foldmarker=--|>,--|| foldlevel=2 foldmethod=marker spell:
 
-let s:current_file = fnamemodify(resolve(expand("<sfile>")), ":p:h")
-let &runtimepath   ="C:/msg/home/tg/.files-vim," . s:current_file . ',' . s:current_file . "/after," . &runtimepath
 
-" Yes, I use Windows, allright. If you must know, it's because I have 4 monitors
-" attached to two video cards with two cores each, and for whatever reason NVIDIA's
-" crappy linux drivers don't work well, yet. Or I'm not patient enough to configure them, yet.
-" One of those, though, really.
 
-behave mswin
-set nocompatible                                  " we're not 'vi' spec anymore
+"    First, we start with our essential functions:
 
-call pathogen#helptags()                          " use pathogen's helptags!
-call pathogen#runtime_append_all_bundles()        " use pathogen to handle bundles/
+"    -----------------------------------------------------------------------------------------------------------------
+"                                                                                                             FUNCTIONS
+"    -----------------------------------------------------------------------------------------------------------------
+          " --|>paths, directories
+                         function! Make_Paths()
 
-" Plugin, File-, and Language- Specific Settings {{{
-     filetype off
-     filetype plugin indent on
+                              let s:current_file = fnamemodify(resolve(expand("<sfile>")), ":p:h")
+                              if   has('win32') || has('win64')
+                                let s:os_dir ="$HOME/.files-vim"           " You must set the %HOME% environment
+                              endif                                        "    variable in Windows to the fake-
+                                                                           "    home-directory in MSYS.
+                                                                           " ex:
+                                                                           "    C:\mingw\home\[username][]
+                              let &runtimepath   =     s:os_dir . ',' . 
+                                   \    s:current_file . ',' . 
+                                   \    s:current_file . "/after," . 
+                                   \    &runtimepath
+                         endfunction
+          " --||
+          call Make_Paths() 
+          " --|>pathogen
+                         function! Using_Pathogen()
+                              runtime! autoload/pathogen.vim               " Requires [//.vim/autoload/pathogen.vim][].
+                              call pathogen#helptags()                     " use pathogen's helptags!
+                              call pathogen#runtime_append_all_bundles()   " use pathogen to handle bundles/
+                         endfunction 
+          " --||
+          call Using_Pathogen()
+          " --|> NTreeInit
+                         function! NTreeInit()
+                              redir => bufoutput
+                              buffers!
+                              redir END
+                              let idx = stridx(bufoutput, "NERD_tree")
+                              if idx > -1
+                                        NERDTreeMirror
+                                        NERDTreeFind
+                                        wincmd l
+                              endif
+                         endfunction
+          " --|| 
+"    -----------------------------------------------------------------------------------------------------------------
+"                                                                                                        END FUNCTIONS
+"    -----------------------------------------------------------------------------------------------------------------
 
-     " File: vim {{{
+"    Now that this is done, we can get started:
+     set nocompatible                                                      " vim, for adults
+     filetype                 off
+     filetype                 plugin indent on
+
+"    -----------------------------------------------------------------------------------------------------------------
+"                                                                                                              PLUGINS
+"    -----------------------------------------------------------------------------------------------------------------
+     " File: vim --|>
 
      augroup vim_files
           au!
           autocmd filetype vim set expandtab      " disallow <tab> in Vim files
      augroup end
 
-     " }}}
-     " File: vimrcEx {{{
+     " --||
+     " File: vimrcEx --|>
 
      augroup vimrcEx
      au!
@@ -39,21 +79,43 @@ call pathogen#runtime_append_all_bundles()        " use pathogen to handle bundl
      autocmd BufRead *\.txt setlocal spell spelllang=en_us
 
      augroup END
-     " }}}
-     " File: markdown {{{
+     " --||
+     " File: markdown --|>
 
      augroup mkd
           autocmd BufRead *.mkd set ai formatoptions=tcroqn2 comments=n:>
      augroup END
-     " }}}
-" }}}
-" Terminal: Fonts, Encoding {{{
+     " --||
+     " --|> Plug:        TODO: SuperTab
+     " --||
+     " --|> Plug:        TODO: ShowMarks
+     " --||
+     " --|> Plug:        TODO: Command-T
+     " --||
+     " --|> Plug:        TODO: OmniComplete
+     " --||
+     " --|> Plug:        TODO: Ctags
+     " --||
+     " --|> Plug:        TODO: SnipMate
+     " --||
+     " --|> Plug:        TODO: NerdTree
+     " --||
+     " --|> Plug:        TODO: NerdCommenter
+     " --||
+     " --|> Plug:        TODO: Tabularize
+     " --||
+     " --|> Plug:        TODO: 
+"    -----------------------------------------------------------------------------------------------------------------
+"                                                                                                        END   PLUGINS
+"    -----------------------------------------------------------------------------------------------------------------
+
+" Terminal: Fonts, Encoding --|>
 
      " use utf-8 encoding, please!
      " set termencoding    =utf-8
      " set encoding        =utf-8
-" }}}
-" Syntax: color, lines, cursors {{{
+" --||
+" Syntax: color, lines, cursors --|>
 syntax enable
 
      " Color
@@ -74,7 +136,7 @@ syntax enable
      set backspace =indent,eol,start                   " backspace jumps these characters
      set showmatch                                     " show matching bracket
 
-     " EOLWS: End Of Line WhiteSpace {{{
+     " EOLWS: End Of Line WhiteSpace --|>
      autocmd InsertEnter * syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/
      autocmd InsertLeave * syn clear EOLWS | syn match EOLWS excludenl /\s\+$/
      highlight EOLWS ctermbg=red guibg=red
@@ -91,9 +153,9 @@ syntax enable
           call cursor(l, c)
      endfunction
 
-     " }}}
-"}}}
-" Windows {{{
+     " --||
+"--||
+" Windows --|>
 
 set showmode
 set visualbell
@@ -116,8 +178,8 @@ set relativenumber
      set sidescrolloff   =2
 endif
 
-" }}}
-" Sessions {{{
+" --||
+" Sessions --|>
 
      " --- syntax        | ------ thing to remember
      " 'n                 marks from previous <n> files
@@ -129,8 +191,8 @@ endif
      set viminfo    ='10,\"100,:20,%,n~/.viminfo
      set history    =20
      set undolevels =1000
-" }}}
-" StatusBar  {{{
+" --||
+" StatusBar  --|>
 set laststatus =2
 set statusline      =
 set statusline     +=%-3.3n\                      " buffer number
@@ -142,8 +204,11 @@ set statusline     +=%=                           " right align remainder
 set statusline     +=0x%-8B                       " character value
 set statusline     +=%-14(%l,%c%V%)               " line, character
 set statusline     +=%<%P                         " file position
-"}}}
-" INPUT {{{
+"--||
+
+"    -----------------------------------------------------------------------------------------------------------------
+"                                                                                                                 INPUT
+"    -----------------------------------------------------------------------------------------------------------------
 
 set lazyredraw      " skip redraw when running macros
 set nojoinspaces    " don't insert two spaces when joining, after punctuation
@@ -152,11 +217,11 @@ set nojoinspaces    " don't insert two spaces when joining, after punctuation
 "
 " <;> and <,>       -- are normally used for repitition with <f>, <F>, <t>, <T>.
 noremap ; ,
-"       ^^^         -- <:> <--> <;>      -- remapped to Command mode
+"       ^^^         -- <:> <--|| <;>      -- remapped to Command mode
 let mapleader =","
-"               ^   -- <\>  --> <,>      -- remap 'mapleader' to <,>
+"               ^   -- <\>  --|| <,>      -- remap 'mapleader' to <,>
 
-     " INPUT: Key Mappings {{{
+     " INPUT: Key Mappings --|>
 
      " WARNING:
      " Niether comments, tabs, or spaces, are allowed after map-style commands.
@@ -217,8 +282,8 @@ let mapleader =","
           "nnoremap a h
           "nnoremap d l
           "nnoremap k d
-     " }}}
-          " INPUT: AutoCompletion {{{
+     " --||
+          " INPUT: AutoCompletion --|>
 
      "          set wildmenu
      "          set wildmode   =longest:full,list:full
@@ -235,8 +300,8 @@ let mapleader =","
           " t                  tag completion
           " u                  scan the unloaded buffers that are in the buffer list
      "     set complete =.,w,b,i,t,u
-               "}}}
-     " INPUT: Tabs, Spaces, Indents {{{
+               "--||
+     " INPUT: Tabs, Spaces, Indents --|>
 
           "   --- value                --- alias        --- description
           set autoindent                   "set ai          <enter> keeps you at current indent
@@ -247,8 +312,8 @@ let mapleader =","
           set softtabstop     =5           "set sts         number of <Space>s that <Tab> counts for
           set shiftwidth      =5           "set sw          number of <Space>s to use for 'autoindent'
           set shiftround                   "set sr          round indents to multiples of 'sw'
-     " }}}
-     " INPUT: Search and Replace {{{
+     " --||
+     " INPUT: Search and Replace --|>
 
      " Automatically insert a \v before any string you search for.
      " -- REF http://stevelosh.com/blog/2010/09/coming-home-to-vim/
@@ -263,10 +328,11 @@ let mapleader =","
      set gdefault                            "set gd        use /g (match all) by default
 
 
-     " }}}
-
-" INPUT }}}
-" {{{ Folding: <space> toggles
+     " --||
+"    ------------------------------------------------------------------------------------------------------------------
+"                                                                                                             END INPUT
+"    ------------------------------------------------------------------------------------------------------------------
+" --|> Folding: <space> toggles
 
 if has("gui_win32")
      set foldenable                     "set fen       enable folding
@@ -283,8 +349,8 @@ if has("gui_win32")
      set foldopen  +=percent,quickfix
 
 endif
-" }}}
-" FILES: swap, backup, dotfiles {{{
+" --||
+" FILES: swap, backup, dotfiles --|>
 
      " swap files
      set noswapfile                          " don't use a swap file...
@@ -300,8 +366,8 @@ endif
           set undodir =~/.vim-annex/undo     " and put it here.
      endif
 
-" }}}
-" diff {{{
+" --||
+" --|> diff
 set diffexpr=MyDiff()
 function! MyDiff()
   let opt = '-a --binary '
@@ -326,4 +392,6 @@ function! MyDiff()
   endif
   silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
 endfunction
+
+
 " }}
