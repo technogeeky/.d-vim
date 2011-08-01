@@ -2,6 +2,10 @@
 " vim: set foldmarker=--|>,--|| foldlevel=2 foldmethod=marker spell:
 
 
+     "    These are mandatory, and order matters. These must be at the top!
+     set                           nocompatible
+     filetype                      off
+     filetype plugin indent        on
 
 "    First, we start with our essential functions:
 
@@ -13,12 +17,14 @@
 
                               let s:current_file = fnamemodify(resolve(expand("<sfile>")), ":p:h")
                               if   has('win32') || has('win64')
+                                let s:v_dir  ="$HOME/.vim/bundle/vundle"   " This is where vundle is.
                                 let s:os_dir ="$HOME/.files-vim"           " You must set the %HOME% environment
                               endif                                        "    variable in Windows to the fake-
                                                                            "    home-directory in MSYS.
                                                                            " ex:
                                                                            "    C:\mingw\home\[username][]
-                              let &runtimepath   =     s:os_dir . ',' . 
+                              let &runtimepath   =     s:v_dir . ',' . 
+                                   \    s:os_dir       . ',' . 
                                    \    s:current_file . ',' . 
                                    \    s:current_file . "/after," . 
                                    \    &runtimepath
@@ -33,6 +39,13 @@
                          endfunction 
           " --||
           call Using_Pathogen()
+          " --|>vundle
+                         function! Using_Vundle()
+                              call vundle#rc()
+                              Bundle 'gmarik/vundle'
+                         endfunction
+          " --||
+          call Using_Vundle()
           " --|> NTreeInit
                          function! NTreeInit()
                               redir => bufoutput
@@ -49,12 +62,6 @@
 "    -----------------------------------------------------------------------------------------------------------------
 "                                                                                                        END FUNCTIONS
 "    -----------------------------------------------------------------------------------------------------------------
-
-"    Now that this is done, we can get started:
-     set nocompatible                                                      " vim, for adults
-     filetype                 off
-     filetype                 plugin indent on
-
 "    -----------------------------------------------------------------------------------------------------------------
 "                                                                                                              PLUGINS
 "    -----------------------------------------------------------------------------------------------------------------
@@ -86,6 +93,68 @@
           autocmd BufRead *.mkd set ai formatoptions=tcroqn2 comments=n:>
      augroup END
      " --||
+     " --|> Bundle:           neocomplcache
+
+                              Bundle 'Shougo/neocomplcache'
+                              let g:neocomplcache_enable_at_startup = 1    " Enable at startup.
+
+                              "Other things to play with:
+
+                              let g:neocomplcache_enable_smart_case             = 1
+                              let g:neocomplcache_enable_camel_case_completion  = 1
+                              let g:neocomplcache_enable_underbar_completion    = 1
+                              let g:neocomplcache_min_syntax_length             = 3
+                              let g:neocomplcache_dictionary_filetype_lists = {
+                                  \ 'default' : '',
+                                  \ 'vimshell' : $HOME.'/.vimshell_hist',
+                                  \ 'scheme' : $HOME.'/.gosh_completions'
+                                  \ }
+
+                              if !exists('g:neocomplcache_keyword_patterns')
+                                   let g:neocomplcache_keyword_patterns = {}
+                              endif
+                              let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+
+                              " Plugin key-mappings.
+                              imap <C-k>     <Plug>(neocomplcache_snippets_expand)
+                              smap <C-k>     <Plug>(neocomplcache_snippets_expand)
+                              inoremap <expr><C-g>     neocomplcache#undo_completion()
+                              inoremap <expr><C-l>     neocomplcache#complete_common_string()
+
+                              " SuperTab like snippets behavior.
+                              "imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+
+                              " Recommended key-mappings.
+                              " <CR>: close popup and save indent.
+                              "inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
+                              " <TAB>: completion.
+                              inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+                              " <C-h>, <BS>: close popup and delete backword char.
+                              inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+                              inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+                              inoremap <expr><C-y>  neocomplcache#close_popup()
+                              inoremap <expr><C-e>  neocomplcache#cancel_popup()
+
+
+                              " Enable omni completion.
+                              autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+                              autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+                              autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+                              autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+                              autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+                              " Enable heavy omni completion.
+                              if !exists('g:neocomplcache_omni_patterns')
+                                   let g:neocomplcache_omni_patterns = {}
+                              endif
+                              let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+                              "autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+                              let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+                              let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
+                              let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
+
+
+     "  --||
      " --|> Plug:        TODO: SuperTab
      " --||
      " --|> Plug:        TODO: ShowMarks
@@ -129,7 +198,7 @@ syntax enable
      endif
 
      " Lines
-     set wrap!                                         " default: set nowrap
+     set nowrap!                                       " default: set nowrap
      set textwidth =123                                " default: set textwidth=79
 
      " Cursor
