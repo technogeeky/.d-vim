@@ -1,0 +1,52 @@
+## | 
+##   An attempt at an exhaustive .gitignore.
+##   
+##   0.   todo      the abstract directory we're interested in: [~ == /home/<name>]
+##   1.   -+-:      ignore all directories, but remember (at least) one
+##   2.   -++:      add a list of files which we won't ignore
+##   3.   ???:      profit.
+
+## 0.     TODO:
+          # Not sure how this will work. The idea is simple.
+          # Given a forest:
+           /   home  /   <name>
+                              
+                    # ^
+          # We want to specify `# ^` where in the forest we will splice this directory.
+          # In this case, we're making a ~ |home directory| .* |dot-files| forest.
+          
+          # given a forest:
+          /home/tg  /
+                    /.boson   /
+                    /.ripl    /
+                    /.pik     /
+                    .riplrc
+                    .pikrc
+
+          # we want to merge in a forest:
+                    /.vim          /
+                    /.vim-annex    /
+                    .vimrc
+          
+          # And be assured of not stepping on each other's files.
+
+
+## 1.     ignore everything to start
+/*
+
+## 2.     we're interested in these
+!/.vim/
+!/.vimrc
+
+## 2a.    and, of course, this file
+!/.gitignore
+
+## 2b.    and probably this file
+!/.gitmodules
+
+          #    readme.md (disabled, for now)
+
+## 3.     profit
+##
+##        now, we can `git clone` many of these repositories and
+##        not worry about conflicts in the topmost directory
