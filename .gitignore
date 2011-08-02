@@ -9,9 +9,9 @@
 ## 0.     TODO:
           # Not sure how this will work. The idea is simple.
           # Given a forest:
-           /   home  /   <name>
-                              
+           /   home  /   <name>                              
                     # ^
+
           # We want to specify `# ^` where in the forest we will splice this directory.
           # In this case, we're making a ~ |home directory| .* |dot-files| forest.
           
