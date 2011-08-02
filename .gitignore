@@ -32,18 +32,21 @@
 
 
 ## 1.     ignore everything to start
+
 /*
 
 ## 2.     we're interested in these
+
 !/.vim/
 !/.vimrc
 
 ## 2a.    and, of course, this file
+
 !/.gitignore
 
 ## 2b.    and probably this file
-!/.gitmodules
 
+!/.gitmodules
           #    readme.md (disabled, for now)
 
 ## 3.     profit
