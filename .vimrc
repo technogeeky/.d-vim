@@ -1,24 +1,26 @@
-" --- ------ | -- --- ------ | -- --- ------ |
-" vim: set foldmarker=--|>,--|| foldlevel=2 foldmethod=marker spell:
-
-
-     "    These are mandatory, and order matters. These must be at the top!
+"    ---------------------------------------------------------------------------------------------------------------------
+"                                                                                                                   HEADER:
+"    ---------------------------------------------------------------------------------------------------------------------
+     " Vim Marker: --|>
+     " vim: set foldmarker=--|>,--|| foldlevel=2 foldmethod=marker spell:
+     " --||
+     " Mandatory Settings: --|>
+     " These are mandatory, and order matters. These must be at the top!
+     "
      set                           nocompatible
      filetype                      off
      filetype plugin indent        on
-
-"    First, we start with our essential functions:
-
-"    -----------------------------------------------------------------------------------------------------------------
-"                                                                                                             FUNCTIONS
-"    -----------------------------------------------------------------------------------------------------------------
+     " --||
+"    ---------------------------------------------------------------------------------------------------------------------
+"                                                                                                                FUNCTIONS:
+"    ---------------------------------------------------------------------------------------------------------------------
           " --|>paths, directories
                          function! Make_Paths()
 
                               let s:current_file = fnamemodify(resolve(expand("<sfile>")), ":p:h")
                               if   has('win32') || has('win64')
                                 let s:v_dir  ="$HOME/.vim/bundle/vundle"   " This is where vundle is.
-                                let s:os_dir ="$HOME/.files-vim"           " You must set the %HOME% environment
+                                let s:os_dir ="$HOME/.vim"           " You must set the %HOME% environment
                               endif                                        "    variable in Windows to the fake-
                                                                            "    home-directory in MSYS.
                                                                            " ex:
@@ -59,20 +61,9 @@
                               endif
                          endfunction
           " --|| 
-"    -----------------------------------------------------------------------------------------------------------------
-"                                                                                                        END FUNCTIONS
-"    -----------------------------------------------------------------------------------------------------------------
-"    -----------------------------------------------------------------------------------------------------------------
-"                                                                                                              PLUGINS
-"    -----------------------------------------------------------------------------------------------------------------
-     " File: vim --|>
-
-     augroup vim_files
-          au!
-          autocmd filetype vim set expandtab      " disallow <tab> in Vim files
-     augroup end
-
-     " --||
+     "    ----------------------------------------------------------------------------------------------------------------
+     "                                                                                                   Filetype SETTINGS:
+     "    ----------------------------------------------------------------------------------------------------------------
      " File: vimrcEx --|>
 
      augroup vimrcEx
@@ -93,10 +84,20 @@
           autocmd BufRead *.mkd set ai formatoptions=tcroqn2 comments=n:>
      augroup END
      " --||
-     " --|> Bundle:           neocomplcache
+     " File: vim --|>
 
+     augroup vim_files
+          au!
+          autocmd filetype vim set expandtab      " disallow <tab> in Vim files
+     augroup end
+
+     " --||
+     "    ----------------------------------------------------------------------------------------------------------------
+     "                                                                                                             PLUGINS:
+     "    ----------------------------------------------------------------------------------------------------------------
+     " Use Bundle:            neocomplcache --|>
                               Bundle 'Shougo/neocomplcache'
-                              let g:neocomplcache_enable_at_startup = 1    " Enable at startup.
+                              let g:neocomplcache_enable_at_startup = 0    " Enable at startup.
 
                               "Other things to play with:
 
@@ -104,11 +105,11 @@
                               let g:neocomplcache_enable_camel_case_completion  = 1
                               let g:neocomplcache_enable_underbar_completion    = 1
                               let g:neocomplcache_min_syntax_length             = 3
-                              let g:neocomplcache_dictionary_filetype_lists = {
-                                  \ 'default' : '',
-                                  \ 'vimshell' : $HOME.'/.vimshell_hist',
-                                  \ 'scheme' : $HOME.'/.gosh_completions'
-                                  \ }
+                              "let g:neocomplcache_dictionary_filetype_lists = {
+                              "    \ 'default' : '',
+                              "    \ 'vimshell' : $HOME.'/.vimshell_hist',
+                              "    \ 'scheme' : $HOME.'/.gosh_completions'
+                              "    \ }
 
                               if !exists('g:neocomplcache_keyword_patterns')
                                    let g:neocomplcache_keyword_patterns = {}
@@ -155,7 +156,46 @@
 
 
      "  --||
+     " Use Bundle:            repl.vim --|> 
+                              
+                              " This stuff doesn't work yet on MSYS.
+                              "Bundle 'ujihisa/repl.vim'
+     "  --||
+     " Require Bundles:       quickrun, vimshell, vimproc --|>
+                                   
+                                   Bundle 'Shougo/vimshell'
+                                   Bundle 'technogeeky/vimproc'
+                                   Bundle 'thinca/vim-quickrun'
+                                   
+                                   " --||
+     " Use Bundle:            vim-indent-guides --|>
+                              
+                              Bundle 'nathanaelkane/vim-indent-guides'
+                              let g:indent_guides_enable_on_vim_startup    =1
+                              let g:indent_guides_start_level              =2
+                              let g:indent_guides_guide_size               =3
+     " --||
+     " Use Bundle:            vim-solarized --|>
+                                                  Bundle 'altercation/vim-colors-solarized'
+                                                  
+                                                  colorscheme                   solarized
+                                                  set background                =dark
+                                                  let g:solarized_italic        =0
+                                                  let g:solarized_bold          =1
+                                                  let g:solarized_underline     =1
+                                                  let g:solarized_visibility    ='normal'
+     " --||
+     " Use Bundles:            tpope's --|>
+                              "                             Bundle 'tpope/vim-markdown'
+                              Bundle 'tpope/vim-endwise'
+                              Bundle 'tpope/vim-repeat'
+     " --||
+     " Use Bundle:            mine!!
+                              Bundle 'technogeeky/vim-markdown'
+     " --||
+                              
      " --|> Plug:        TODO: SuperTab
+
      " --||
      " --|> Plug:        TODO: ShowMarks
      " --||
@@ -173,11 +213,8 @@
      " --||
      " --|> Plug:        TODO: Tabularize
      " --||
-     " --|> Plug:        TODO: 
-"    -----------------------------------------------------------------------------------------------------------------
-"                                                                                                        END   PLUGINS
-"    -----------------------------------------------------------------------------------------------------------------
-
+     " --|> Plug:        TODO:
+     " --||
 " Terminal: Fonts, Encoding --|>
 
      " use utf-8 encoding, please!
@@ -234,13 +271,17 @@ set ttyfast
 set ruler
 set background      =dark
 
-set list
+" set list
 set listchars=tab:▸\ ,eol:¬
 
 set relativenumber
    if has("gui_win32")
      set cursorline
-     set colorcolumn     =1,2,3,4,30,45,60,75,90,105,120,121,122,123
+"     set colorcolumn     =1,2,3,4,30,45,60,75,90,105,120,121,122,123
+     set colorcolumn =123
+     highlight ColorColumn    guibg=#073642
+     highlight OverLength     guibg=#d33682
+     match     OverLength     /\%124v.\+/
      set cmdheight       =2
      set sidescroll      =2
      set scrolloff       =3
@@ -274,11 +315,10 @@ set statusline     +=0x%-8B                       " character value
 set statusline     +=%-14(%l,%c%V%)               " line, character
 set statusline     +=%<%P                         " file position
 "--||
-
-"    -----------------------------------------------------------------------------------------------------------------
-"                                                                                                                 INPUT
-"    -----------------------------------------------------------------------------------------------------------------
-
+"    ---------------------------------------------------------------------------------------------------------------------
+"                                                                                                                    INPUT:
+"    ---------------------------------------------------------------------------------------------------------------------
+" INPUT General Settings:--|>
 set lazyredraw      " skip redraw when running macros
 set nojoinspaces    " don't insert two spaces when joining, after punctuation
 
@@ -286,10 +326,10 @@ set nojoinspaces    " don't insert two spaces when joining, after punctuation
 "
 " <;> and <,>       -- are normally used for repitition with <f>, <F>, <t>, <T>.
 noremap ; ,
-"       ^^^         -- <:> <--|| <;>      -- remapped to Command mode
+"       ^^^         -- <:> -> <;>         -- remapped to Command mode
 let mapleader =","
-"               ^   -- <\>  --|| <,>      -- remap 'mapleader' to <,>
-
+"               ^   -- <\> -> <,>      -- remap 'mapleader' to <,>
+" --||
      " INPUT: Key Mappings --|>
 
      " WARNING:
@@ -306,7 +346,7 @@ let mapleader =","
           vnoremap <F1> <ESC>
      "    ^ visual ^^^^^^^^^^ -- make help do nothing
 
-          nmap <silent> <leader><space> :call <SID>StripTrailingWhitespace()<CR>
+     "     nmap <silent> <leader><space> :call <SID>StripTrailingWhitespace()<CR>
      "    ^normal        ^ <,>< >       ^^^^ -- strips all trailing whitespace
      
           nmap <leader><space> :noh<CR>
@@ -332,7 +372,7 @@ let mapleader =","
 
           nmap <silent> ,ev :e $MYVIMRC<CR>
      "    ^ normal      ^<,><e><v> ^^^^^^^^^^^^ -- edit my vimrc
-          nmap <silent> ,sv :so $MYVIMRC<CR>
+          nmap <silent> ,rv :so $MYVIMRC<CR>
      "    ^ normal      ^<,><e><v> ^^^^^^^^^^^^ -- reload my vimrc
 
           " XXX: train myself to do vim -- the right way --
@@ -368,7 +408,7 @@ let mapleader =","
           " i                  scan current and included files
           " t                  tag completion
           " u                  scan the unloaded buffers that are in the buffer list
-     "     set complete =.,w,b,i,t,u
+          "     set complete =.,w,b,i,t,u
                "--||
      " INPUT: Tabs, Spaces, Indents --|>
 
@@ -381,6 +421,7 @@ let mapleader =","
           set softtabstop     =5           "set sts         number of <Space>s that <Tab> counts for
           set shiftwidth      =5           "set sw          number of <Space>s to use for 'autoindent'
           set shiftround                   "set sr          round indents to multiples of 'sw'
+
      " --||
      " INPUT: Search and Replace --|>
 
@@ -398,9 +439,6 @@ let mapleader =","
 
 
      " --||
-"    ------------------------------------------------------------------------------------------------------------------
-"                                                                                                             END INPUT
-"    ------------------------------------------------------------------------------------------------------------------
 " --|> Folding: <space> toggles
 
 if has("gui_win32")
