@@ -48,6 +48,29 @@
                          endfunction
           " --||
           call Using_Vundle()
+     " repl --|>
+          function! g:ReplContext()
+               let l:context = {
+                              \ 'fd': { 'stdin': '', 'stdout': '', 'stderr': '' },
+                              \ 'is_interactive': 0,
+                              \ 'is_single_command': 1,
+                              \ 'is_close_immediately': 1
+                              \ }
+               return l:context
+          endfunction
+
+          function! g:ReplShell(args)
+               let l:context = g:ReplContext()
+               call vimshell#commands#iexe#init()
+               call vimshell#set_context(l:context)
+               call vimshell#execute_internal_command(
+                    \ 'iexe', vimproc#parser#split_args(a:args),
+                    \ l:context.fd,
+                    \ l:context)
+               let b:interactive_is_close_immediately = 1
+          endfunction
+
+     " --||
           " --|> NTreeInit
                          function! NTreeInit()
                               redir => bufoutput
@@ -185,15 +208,20 @@
                                                   let g:solarized_underline     =1
                                                   let g:solarized_visibility    ='normal'
      " --||
-     " Use Bundles:            tpope's --|>
+     " Use Bundles:           tpope's --|>
                               "                             Bundle 'tpope/vim-markdown'
                               Bundle 'tpope/vim-endwise'
                               Bundle 'tpope/vim-repeat'
      " --||
-     " Use Bundle:            mine!!
+     " Use Bundle:            mine!! --|>
                               Bundle 'technogeeky/vim-markdown'
      " --||
-                              
+     " Use Bundle:            NerdCommenter --|>
+                              Bundle 'scrooloose/nerdcommenter'
+     " --||
+     " Use Bundle:            tabular --|>
+                              Bundle 'godlygeek/tabular'
+     " --||
      " --|> Plug:        TODO: SuperTab
 
      " --||
@@ -208,10 +236,6 @@
      " --|> Plug:        TODO: SnipMate
      " --||
      " --|> Plug:        TODO: NerdTree
-     " --||
-     " --|> Plug:        TODO: NerdCommenter
-     " --||
-     " --|> Plug:        TODO: Tabularize
      " --||
      " --|> Plug:        TODO:
      " --||
@@ -228,7 +252,7 @@ syntax enable
      colorscheme default
 
       if has("gui_win32")
-          behave mswin
+          "behave mswin
           set enc=utf-8
           set guifont=Consolas:h11
           colorscheme solarized
