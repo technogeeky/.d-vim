@@ -10,6 +10,7 @@
      set                           nocompatible
      filetype                      off
      filetype plugin indent        on
+     set                           fileformat=unix
      " --||
 "    ---------------------------------------------------------------------------------------------------------------------
 "                                                                                                                FUNCTIONS:
@@ -18,29 +19,17 @@
                          function! Make_Paths()
 
                               let s:current_file = fnamemodify(resolve(expand("<sfile>")), ":p:h")
-                              if   has('win32') || has('win64')
-                                let s:v_dir  ="$HOME/.vim/bundle/vundle"   " This is where vundle is.
-                                let s:os_dir ="$HOME/.vim"           " You must set the %HOME% environment
-                              endif                                        "    variable in Windows to the fake-
-                                                                           "    home-directory in MSYS.
-                                                                           " ex:
-                                                                           "    C:\mingw\home\[username][]
-                              let &runtimepath   =     s:v_dir . ',' . 
-                                   \    s:os_dir       . ',' . 
-                                   \    s:current_file . ',' . 
-                                   \    s:current_file . "/after," . 
+                              let s:v_dir    ="$HOME/.vim/bundle/vundle"
+                              let s:os_dir   ="$HOME/.vim"
+
+                              let &runtimepath   =     s:v_dir . ',' .
+                                   \    s:os_dir       . ',' .
+                                   \    s:current_file . ',' .
+                                   \    s:current_file . "/after," .
                                    \    &runtimepath
                          endfunction
           " --||
-          call Make_Paths() 
-          " --|>pathogen
-                         function! Using_Pathogen()
-                              runtime! autoload/pathogen.vim               " Requires [//.vim/autoload/pathogen.vim][].
-                              call pathogen#helptags()                     " use pathogen's helptags!
-                              call pathogen#runtime_append_all_bundles()   " use pathogen to handle bundles/
-                         endfunction 
-          " --||
-          call Using_Pathogen()
+          call Make_Paths()
           " --|>vundle
                          function! Using_Vundle()
                               call vundle#rc()
@@ -83,7 +72,7 @@
                                         wincmd l
                               endif
                          endfunction
-          " --|| 
+          " --||
      "    ----------------------------------------------------------------------------------------------------------------
      "                                                                                                   Filetype SETTINGS:
      "    ----------------------------------------------------------------------------------------------------------------
@@ -120,79 +109,79 @@
      "    ----------------------------------------------------------------------------------------------------------------
      " Use Bundle:            neocomplcache --|>
                               Bundle 'Shougo/neocomplcache'
-                              let g:neocomplcache_enable_at_startup = 0    " Enable at startup.
+                              let g:neocomplcache_enable_at_startup = 1    " Enable at startup.
 
-                              "Other things to play with:
+                              ""Other things to play with:
 
-                              let g:neocomplcache_enable_smart_case             = 1
-                              let g:neocomplcache_enable_camel_case_completion  = 1
-                              let g:neocomplcache_enable_underbar_completion    = 1
-                              let g:neocomplcache_min_syntax_length             = 3
-                              "let g:neocomplcache_dictionary_filetype_lists = {
-                              "    \ 'default' : '',
-                              "    \ 'vimshell' : $HOME.'/.vimshell_hist',
-                              "    \ 'scheme' : $HOME.'/.gosh_completions'
-                              "    \ }
+                              "let g:neocomplcache_enable_smart_case             = 1
+                              "let g:neocomplcache_enable_camel_case_completion  = 1
+                              "let g:neocomplcache_enable_underbar_completion    = 1
+                              "let g:neocomplcache_min_syntax_length             = 3
+                              ""let g:neocomplcache_dictionary_filetype_lists = {
+                              ""    \ 'default' : '',
+                              ""    \ 'vimshell' : $HOME.'/.vimshell_hist',
+                              ""    \ 'scheme' : $HOME.'/.gosh_completions'
+                              ""    \ }
 
-                              if !exists('g:neocomplcache_keyword_patterns')
-                                   let g:neocomplcache_keyword_patterns = {}
-                              endif
-                              let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+                              "if !exists('g:neocomplcache_keyword_patterns')
+                                   "let g:neocomplcache_keyword_patterns = {}
+                              "endif
+                              "let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
 
-                              " Plugin key-mappings.
-                              imap <C-k>     <Plug>(neocomplcache_snippets_expand)
-                              smap <C-k>     <Plug>(neocomplcache_snippets_expand)
-                              inoremap <expr><C-g>     neocomplcache#undo_completion()
-                              inoremap <expr><C-l>     neocomplcache#complete_common_string()
+                              "" Plugin key-mappings.
+                              "imap <C-k>     <Plug>(neocomplcache_snippets_expand)
+                              "smap <C-k>     <Plug>(neocomplcache_snippets_expand)
+                              "inoremap <expr><C-g>     neocomplcache#undo_completion()
+                              "inoremap <expr><C-l>     neocomplcache#complete_common_string()
 
-                              " SuperTab like snippets behavior.
-                              "imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+                              "" SuperTab like snippets behavior.
+                              ""imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
 
-                              " Recommended key-mappings.
-                              " <CR>: close popup and save indent.
-                              "inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-                              " <TAB>: completion.
-                              inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-                              " <C-h>, <BS>: close popup and delete backword char.
-                              inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-                              inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-                              inoremap <expr><C-y>  neocomplcache#close_popup()
-                              inoremap <expr><C-e>  neocomplcache#cancel_popup()
+                              "" Recommended key-mappings.
+                              "" <CR>: close popup and save indent.
+                              ""inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
+                              "" <TAB>: completion.
+                              "inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+                              "" <C-h>, <BS>: close popup and delete backword char.
+                              "inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+                              "inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+                              "inoremap <expr><C-y>  neocomplcache#close_popup()
+                              "inoremap <expr><C-e>  neocomplcache#cancel_popup()
 
 
-                              " Enable omni completion.
-                              autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-                              autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-                              autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-                              autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-                              autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+                              "" Enable omni completion.
+                              "autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+                              "autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+                              "autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+                              "autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+                              "autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
-                              " Enable heavy omni completion.
-                              if !exists('g:neocomplcache_omni_patterns')
-                                   let g:neocomplcache_omni_patterns = {}
-                              endif
-                              let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
-                              "autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-                              let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-                              let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-                              let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
+                              "" Enable heavy omni completion.
+                              "if !exists('g:neocomplcache_omni_patterns')
+                                   "let g:neocomplcache_omni_patterns = {}
+                              "endif
+                              "let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+                              ""autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+                              "let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+                              "let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
+                              "let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 
 
      "  --||
-     " Use Bundle:            repl.vim --|> 
-                              
+     " Use Bundle:            repl.vim --|>
+
                               " This stuff doesn't work yet on MSYS.
                               "Bundle 'ujihisa/repl.vim'
      "  --||
      " Require Bundles:       quickrun, vimshell, vimproc --|>
-                                   
-                                   Bundle 'Shougo/vimshell'
-                                   Bundle 'technogeeky/vimproc'
+
+                                   "Bundle 'Shougo/vimshell'
+                                   "Bundle 'Shougo/vimproc'
                                    Bundle 'thinca/vim-quickrun'
-                                   
+
                                    " --||
      " Use Bundle:            vim-indent-guides --|>
-                              
+
                               Bundle 'nathanaelkane/vim-indent-guides'
                               let g:indent_guides_enable_on_vim_startup    =1
                               let g:indent_guides_start_level              =2
@@ -200,7 +189,7 @@
      " --||
      " Use Bundle:            vim-solarized --|>
                                                   Bundle 'altercation/vim-colors-solarized'
-                                                  
+
                                                   colorscheme                   solarized
                                                   set background                =dark
                                                   let g:solarized_italic        =0
@@ -221,6 +210,16 @@
      " --||
      " Use Bundle:            tabular --|>
                               Bundle 'godlygeek/tabular'
+     " --||
+     " Use Bundle:            vim-css-color --|>
+                              Bundle 'skammer/vim-css-color'
+     " --||
+     " Use Bundle:            vim-preview --|>
+                              Bundle 'greyblake/vim-preview'
+     " --||
+     " Use Bundle:            vim-haskellConceal --|>
+                              Bundle 'Twinside/vim-haskellConceal'
+                              let g:no_haskell_conceal                =1
      " --||
      " --|> Plug:        TODO: SuperTab
 
@@ -250,9 +249,9 @@ syntax enable
 
      " Color
      colorscheme default
-
+     behave xterm
       if has("gui_win32")
-          "behave mswin
+          behave xterm
           set enc=utf-8
           set guifont=Consolas:h11
           colorscheme solarized
@@ -294,9 +293,6 @@ set showcmd
 set ttyfast
 set ruler
 set background      =dark
-
-" set list
-set listchars=tab:▸\ ,eol:¬
 
 set relativenumber
    if has("gui_win32")
@@ -372,7 +368,7 @@ let mapleader =","
 
      "     nmap <silent> <leader><space> :call <SID>StripTrailingWhitespace()<CR>
      "    ^normal        ^ <,>< >       ^^^^ -- strips all trailing whitespace
-     
+
           nmap <leader><space> :noh<CR>
      "    ^ normal  ^ <,>< >   ^^^^          -- cancel the search highlighting
 
@@ -465,10 +461,18 @@ let mapleader =","
      " --||
 " --|> Folding: <space> toggles
 
-if has("gui_win32")
+if has("gui")
      set foldenable                     "set fen       enable folding
 
-     set foldmethod =marker             "set fdm       look for patterns of triple-braces in files
+"     set foldmethod =marker             "set fdm       look for patterns of triple-braces in files
+     "set foldmarker ="-- | >,-- | |"     "set fmr       a strange fold marker, to be sure.
+                                        ""                   -- important:
+                                        ""                   -- this will be important with [n=5][] character tabstops.
+                                        ""                   -- the starting foldmarker is *[n+1=6][]* characters."
+                                        ""                   -- this means the > and | must be in the next block
+                                        ""                   -- also, you insert text inside extra space
+                                        ""                   -- or make it a color (for ID purposes)
+                                        ""
      set foldcolumn =3                  "set fdc       create a left-hand <gutter> fir displaying fold info
      set foldclose  =                   "set foldc     fold close range is undefined
 
