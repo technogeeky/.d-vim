@@ -15,7 +15,13 @@
 "    ---------------------------------------------------------------------------------------------------------------------
 "                                                                                                                FUNCTIONS:
 "    ---------------------------------------------------------------------------------------------------------------------
-          " --|>paths, directories
+"set  shellquote=
+"set  shellslash    
+"set  shellxquote=
+"set  shellpipe=2>&1\|tee
+"set  shellredir=>%s\  2>&1
+
+" --|>paths, directories
                          function! Make_Paths()
 
                               let s:current_file = fnamemodify(resolve(expand("<sfile>")), ":p:h")
@@ -73,14 +79,53 @@
                               endif
                          endfunction
           " --||
+
      "    ----------------------------------------------------------------------------------------------------------------
      "                                                                                                   Filetype SETTINGS:
      "    ----------------------------------------------------------------------------------------------------------------
+     "    File: ANY--|>
+          autocmd   BufReadPost *
+                         \ if line("'\"") > 0 && line("'\"") <= line ("$") |
+                         \    exe "normal g`\""                            |
+                         \ endif
+                         
+          autocmd   FileChangedShell *
+                         \ echohl WarningMsg                               |
+                         \ echo "File has been changed outside of vim."    |
+                         \ encohl None
+
+          " when we reload, tell vim to restore the cursor to the saved position
+          augroup JumpCursorOnEdit
+               au!
+          autocmd BufReadPost *
+                    \ if expand("<afile>:p:h") !=? $TEMP |
+                    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+                    \ let JumpCursorOnEdit_foo = line("'\"") |
+                    \ let b:doopenfold = 1 |
+                    \ if (foldlevel(JumpCursorOnEdit_foo) > foldlevel(JumpCursorOnEdit_foo - 1)) |
+                    \ let JumpCursorOnEdit_foo = JumpCursorOnEdit_foo - 1 |
+                    \ let b:doopenfold = 2 |
+                    \ endif |
+                    \ exe JumpCursorOnEdit_foo |
+                    \ endif |
+                    \ endif
+     " Need to postpone using "zv" until after reading the modelines.
+          autocmd BufWinEnter *
+                    \ if exists("b:doopenfold") |
+                    \ exe "normal zv" |
+                    \ if(b:doopenfold > 1) |
+                    \ exe "+".1 |
+                    \ endif |
+                    \ unlet b:doopenfold |
+                    \ endif
+          augroup END
+
+     " --||
+     "
      " File: vimrcEx --|>
 
      augroup vimrcEx
      au!
-
      autocmd BufRead *\.txt setlocal formatoptions=l
      autocmd BufRead *\.txt setlocal lbr
      autocmd BufRead *\.txt map j gj
@@ -90,14 +135,10 @@
 
      augroup END
      " --||
-     " File: markdown --|>
 
-     augroup mkd
-          autocmd BufRead *.mkd set ai formatoptions=tcroqn2 comments=n:>
-     augroup END
-     " --||
      " File: vim --|>
 
+      autocmd  BufRead  *\.md  set  ft=markdown
      augroup vim_files
           au!
           autocmd filetype vim set expandtab      " disallow <tab> in Vim files
@@ -113,15 +154,15 @@
 
                               ""Other things to play with:
 
-                              "let g:neocomplcache_enable_smart_case             = 1
-                              "let g:neocomplcache_enable_camel_case_completion  = 1
-                              "let g:neocomplcache_enable_underbar_completion    = 1
-                              "let g:neocomplcache_min_syntax_length             = 3
-                              ""let g:neocomplcache_dictionary_filetype_lists = {
-                              ""    \ 'default' : '',
-                              ""    \ 'vimshell' : $HOME.'/.vimshell_hist',
-                              ""    \ 'scheme' : $HOME.'/.gosh_completions'
-                              ""    \ }
+                              let g:neocomplcache_enable_smart_case             = 1
+                              let g:neocomplcache_enable_camel_case_completion  = 1
+                              let g:neocomplcache_enable_underbar_completion    = 1
+                              let g:neocomplcache_min_syntax_length             = 3
+                              let g:neocomplcache_dictionary_filetype_lists = {
+                                  \ 'default' : '',
+                                  \ 'vimshell' : $HOME.'/.vimshell_hist',
+                                  \ 'scheme' : $HOME.'/.gosh_completions'
+                                  \ }
 
                               "if !exists('g:neocomplcache_keyword_patterns')
                                    "let g:neocomplcache_keyword_patterns = {}
@@ -184,9 +225,12 @@
 
                               Bundle 'nathanaelkane/vim-indent-guides'
                               let g:indent_guides_enable_on_vim_startup    =1
-                              let g:indent_guides_start_level              =2
-                              let g:indent_guides_guide_size               =3
+                              let g:indent_guides_indent_levels            =150
+                              let g:indent_guides_color_change_percent     =3
+                              let g:indent_guides_start_level              =6
+                              let g:indent_guides_guide_size               =5
      " --||
+                                                            
      " Use Bundle:            vim-solarized --|>
                                                   Bundle 'altercation/vim-colors-solarized'
 
@@ -196,6 +240,9 @@
                                                   let g:solarized_bold          =1
                                                   let g:solarized_underline     =1
                                                   let g:solarized_visibility    ='normal'
+     " --||
+     " Use  Bundles:          conque  --|>
+                              "Bundle  'rson/vim-conque'
      " --||
      " Use Bundles:           tpope's --|>
                               "                             Bundle 'tpope/vim-markdown'
@@ -234,15 +281,16 @@
      " --||
      " --|> Plug:        TODO: SnipMate
      " --||
-     " --|> Plug:        TODO: NerdTree
+     " Use Bundle:                                  NerdTree --|>
+                              Bundle    'scrooloose/nerdtree'
      " --||
      " --|> Plug:        TODO:
      " --||
 " Terminal: Fonts, Encoding --|>
 
      " use utf-8 encoding, please!
-     " set termencoding    =utf-8
-     " set encoding        =utf-8
+     set termencoding    =utf-8
+     set encoding        =utf-8
 " --||
 " Syntax: color, lines, cursors --|>
 syntax enable
@@ -253,7 +301,7 @@ syntax enable
       if has("gui_win32")
           behave xterm
           set enc=utf-8
-          set guifont=Consolas:h11
+          set guifont=DejaVu_Sans_Mono:h9
           colorscheme solarized
      endif
 
@@ -293,19 +341,28 @@ set showcmd
 set ttyfast
 set ruler
 set background      =dark
+set nocursorline
+set clipboard   =unnamed
 
+set hidden
+
+if &diff
+     color candycode
+else
+     color solarized
+endif
 set relativenumber
+
    if has("gui_win32")
-     set cursorline
 "     set colorcolumn     =1,2,3,4,30,45,60,75,90,105,120,121,122,123
-     set colorcolumn =123
-     highlight ColorColumn    guibg=#073642
-     highlight OverLength     guibg=#d33682
-     match     OverLength     /\%124v.\+/
-     set cmdheight       =2
-     set sidescroll      =2
-     set scrolloff       =3
-     set sidescrolloff   =2
+"     set colorcolumn      =29,58,87,116,144,145,146
+     highlight ColorColumn    guifg=#859900
+     "highlight OverLength     guibg=#d33682
+     "match     OverLength     /\%123v.\+/
+     set cmdheight       =1
+     set sidescroll      =1
+     set scrolloff       =7
+     set sidescrolloff   =7
 endif
 
 " --||
@@ -328,11 +385,24 @@ set statusline      =
 set statusline     +=%-3.3n\                      " buffer number
 set statusline     +=%f\                          " filename
 set statusline     +=%h%m%r%w                     " status flags
+
+"display a warning if fileformat isnt unix
+set statusline+=%#warningmsg#
+set statusline+=%{&ff!='unix'?'['.&ff.']':''}
+set statusline+=%*
+
+"display a warning if file encoding isnt utf-8
+set statusline+=%#warningmsg#
+set statusline+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''}
+set statusline+=%*
+
 set statusline     +=\[%{strlen(&ft)?&ft:'none'}] " file type
 "set statusline+=\ %{fugitive#statusline()}     " fugitive
+
 set statusline     +=%=                           " right align remainder
 set statusline     +=0x%-8B                       " character value
 set statusline     +=%-14(%l,%c%V%)               " line, character
+set statusline     +=%l/%L "cursor line/total lines
 set statusline     +=%<%P                         " file position
 "--||
 "    ---------------------------------------------------------------------------------------------------------------------
@@ -359,16 +429,16 @@ let mapleader =","
 
      "    mode     src  dest
      "    -------- ---- -----
-          inoremap <F1> <ESC>
-     "    ^ insert ^^^^^^^^^^ -- make help do nothing
-          nnoremap <F1> <ESC>
-     "    ^ normal ^^^^^^^^^^ -- make help do nothing
-          vnoremap <F1> <ESC>
-     "    ^ visual ^^^^^^^^^^ -- make help do nothing
-
+          nnoremap <silent> <F1> :NERDTreeToggle <CR>
+          inoremap <silent> <F1> <esc>:NERDTreeToggle <CR>
+          vnoremap <silent> <F1> <esc>:NERDTreeToggle <CR>
+          
+     "    inoremap <Space> <Space><Space>
+          
      "     nmap <silent> <leader><space> :call <SID>StripTrailingWhitespace()<CR>
      "    ^normal        ^ <,>< >       ^^^^ -- strips all trailing whitespace
 
+     "inoremap <Space> <Space><Space>
           nmap <leader><space> :noh<CR>
      "    ^ normal  ^ <,>< >   ^^^^          -- cancel the search highlighting
 
@@ -378,7 +448,7 @@ let mapleader =","
      "                             <z><i>    toggles all folds
      "                             <z><M>    closes all folds
      "
-          call togglebg#map("<F5>")
+          call togglebg#map("<F7>")
           map  <F10> :set paste!<Bar>set paste?<CR>
      "    ^ all      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    -- toggle 'set paste'
      "     nmap <Tab> I<Tab><ESC>
@@ -414,9 +484,9 @@ let mapleader =","
      " --||
           " INPUT: AutoCompletion --|>
 
-     "          set wildmenu
-     "          set wildmode   =longest:full,list:full
-     "          set wildignore =*.swp,*.bak,*.pyc,*.class
+               set wildmenu
+               set wildmode   =longest:full,list:full
+               set wildignore =*.swp,*.bak,*.pyc,*.class
 
           "Specifies how keyword completion works"
           "http://vimdoc.sourceforge.net/htmldoc/options.html#%27complete%27"
@@ -428,7 +498,7 @@ let mapleader =","
           " i                  scan current and included files
           " t                  tag completion
           " u                  scan the unloaded buffers that are in the buffer list
-          "     set complete =.,w,b,i,t,u
+          set complete =.,w,b,i,t,u
                "--||
      " INPUT: Tabs, Spaces, Indents --|>
 
@@ -441,7 +511,6 @@ let mapleader =","
           set softtabstop     =5           "set sts         number of <Space>s that <Tab> counts for
           set shiftwidth      =5           "set sw          number of <Space>s to use for 'autoindent'
           set shiftround                   "set sr          round indents to multiples of 'sw'
-
      " --||
      " INPUT: Search and Replace --|>
 
@@ -449,7 +518,8 @@ let mapleader =","
      " -- REF http://stevelosh.com/blog/2010/09/coming-home-to-vim/
      nnoremap / /\v
      vnoremap / /\v
-     noremap <F4> :set hls!<CR>
+     noremap <F4> :set hls!<CR>:set ft=markdown<CR>:IndentGuidesToggle<CR>
+
 
      set incsearch                           "set is        jump to results as you type
      set ignorecase                          "set ic        ignore case in patterns
@@ -464,8 +534,9 @@ let mapleader =","
 if has("gui")
      set foldenable                     "set fen       enable folding
 
-"     set foldmethod =marker             "set fdm       look for patterns of triple-braces in files
-     "set foldmarker ="-- | >,-- | |"     "set fmr       a strange fold marker, to be sure.
+     set foldmethod =marker             "set fdm       look for patterns of triple-braces in files
+     "set foldmarker =}}},{{{
+                                        "set fmr       a strange fold marker, to be sure.
                                         ""                   -- important:
                                         ""                   -- this will be important with [n=5][] character tabstops.
                                         ""                   -- the starting foldmarker is *[n+1=6][]* characters."
@@ -528,5 +599,24 @@ function! MyDiff()
   silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
 endfunction
 
+" set the number of lines (at the beginning of the file) checked for vim: statements
+set modelines  =6
+
+" set list
+
+" The <Fn> keys are functions of space!
+set listchars=tab:▸\ ,eol:¬
+
+set go-=b
+set go-=T
+set go-=m
+set go-=r
+map <silent> <F11> :if &guioptions =~# 'T' <Bar>
+        \set go-=T <Bar>
+        \set go-=m <Bar>
+        \else <Bar>
+        \set go+=T <Bar>
+        \set go+=m <Bar>
+        \endif<CR>
 
 " }}
